@@ -19,7 +19,11 @@ def create_data():
     data = request.json
     result = collection.insert_one(data)
     return jsonify({"status": "success", "inserted_id": str(result.inserted_id)})
-
+@app.route('/get_data_esp32', methods=['GET'])
+def get_data():
+    data = list(collection.find({}, {"_id": 1}))  # Ne renvoie que les champs "_id"
+    json_data = json.loads(json_util.dumps(data))
+    return jsonify(json_data)
 @app.route('/get_data', methods=['GET'])
 def get_data():
     data = list(collection.find())
