@@ -38,28 +38,27 @@ def delete_data(id):
     return jsonify({"status": "success", "deleted_count": result.deleted_count})
 
 @app.route('/authenticate', methods=['POST'])
-def authenticate_card():
-    data = request.json
-    card_id = data.get("Carte").replace(" ", "").upper()  # Remove spaces and convert to uppercase
+def authenticate():
+    # Exemple d'authentification simple
+    data = request.get_json()
+    carte = data.get("Carte")
 
-    if not card_id:
-        return jsonify({"authenticated": False, "message": "Aucune carte ID fournie"}), 400
-
-    # Normalize card ID in database and query to match format
-    card = collection.find_one({"Carte": card_id})
-
-    if card:
-        card["_id"] = str(card["_id"])
-        return jsonify({
+    # Rechercher la carte dans la collection MongoDB
+    user = collection.find_one({"Carte": carte})
+    
+    if user:
+        # Construire la réponse avec l'_id inclus
+        response = {
             "authenticated": True,
-            "Nom": card.get("Nom"),
-            "Carte": card.get("Carte"),
-            "Compte": card.get("Compte"),
-            "_id": card.get("_id"),
-            "message": "Carte authentifiée"
-        }), 200
+            "Nom": user.get("Nom", ""),
+            "Carte": user.get("Carte", ""),
+            "Compte": user.get("Compte", ""),
+            "_id": {"$oid": str(user["_id"])}  # Convertir ObjectId en chaîne
+        }
     else:
-        return jsonify({"authenticated": False, "message": "Carte non authentifiée"}), 404
+        response = {"authenticated": False}
+
+    return jsonify(response)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
