@@ -9,7 +9,9 @@ app = Flask(__name__)
 client = MongoClient("mongodb+srv://haaahiii:1234@cluster1.wmj7n.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1")
 db = client['Data_ko']
 collection = db['Data_collectio_nama']
-
+@app.route('/')
+def serve_frontend():
+    return send_from_directory('templates', 'index.html')
 @app.route('/create', methods=['POST'])
 def create_data():
     data = request.json
