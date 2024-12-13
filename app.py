@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from pymongo import MongoClient
 from bson import ObjectId, json_util
 import json
@@ -9,9 +9,11 @@ app = Flask(__name__)
 client = MongoClient("mongodb+srv://haaahiii:1234@cluster1.wmj7n.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1")
 db = client['Data_ko']
 collection = db['Data_collectio_nama']
+
 @app.route('/')
 def serve_frontend():
     return send_from_directory('templates', 'index.html')
+
 @app.route('/create', methods=['POST'])
 def create_data():
     data = request.json
@@ -38,14 +40,14 @@ def delete_data(id):
 @app.route('/authenticate', methods=['POST'])
 def authenticate_card():
     data = request.json
-    card_id = data.get("Carte")
-
+    card_id = data.get("Carte").replace(" ", "").upper()  # Remove spaces and convert to uppercase
+    
     if not card_id:
         return jsonify({"authenticated": False, "message": "Aucune carte ID fournie"}), 400
 
-    # Rechercher la carte dans la base de données
+    # Normalize card ID in database and query to match format
     card = collection.find_one({"Carte": card_id})
-
+    
     if card:
         return jsonify({
             "authenticated": True,
