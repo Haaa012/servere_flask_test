@@ -37,6 +37,24 @@ def update_data(id):
 def delete_data(id):
     result = collection.delete_one({"_id": ObjectId(id)})
     return jsonify({"status": "success", "deleted_count": result.deleted_count})
+@app.route('/authenticate', methods=['POST']) 
+	def authenticate_card(): 
+		data = request.json 
+		card_id = data.get("Carte") 
+		if not card_id: 
+			return jsonify({"authenticated": False, "message": "Aucune carte ID fournie"}), 400 
+		# Rechercher la carte dans la base de données 
+		card = collection.find_one({"Carte": card_id}) 
+		if card: 
+			return jsonify({ 
+				"authenticated": True, 
+				"Nom": card.get("Nom"), 
+				"Carte": card.get("Carte"), 
+				"Compte": card.get("Compte"), 
+				"message": "Carte authentifiée" 
+			}), 200 
+		else: 
+			return jsonify({"authenticated": False, "message": "Carte non authentifiée"}), 404     
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
