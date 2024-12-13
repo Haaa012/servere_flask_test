@@ -19,11 +19,7 @@ def create_data():
     data = request.json
     result = collection.insert_one(data)
     return jsonify({"status": "success", "inserted_id": str(result.inserted_id)})
-@app.route('/get_data_esp32', methods=['GET'])
-def get_data_esp32():
-    data = list(collection.find({}, {"_id": 1}))  # Ne renvoie que les champs "_id"
-    json_data = json.loads(json_util.dumps(data))
-    return jsonify(json_data)
+
 @app.route('/get_data', methods=['GET'])
 def get_data():
     data = list(collection.find())
@@ -45,19 +41,21 @@ def delete_data(id):
 def authenticate_card():
     data = request.json
     card_id = data.get("Carte").replace(" ", "").upper()  # Remove spaces and convert to uppercase
-    
+
     if not card_id:
         return jsonify({"authenticated": False, "message": "Aucune carte ID fournie"}), 400
 
     # Normalize card ID in database and query to match format
     card = collection.find_one({"Carte": card_id})
-    
+
     if card:
+        card["_id"] = str(card["_id"])
         return jsonify({
             "authenticated": True,
             "Nom": card.get("Nom"),
             "Carte": card.get("Carte"),
             "Compte": card.get("Compte"),
+            "_id": card.get("_id"),
             "message": "Carte authentifiée"
         }), 200
     else:
