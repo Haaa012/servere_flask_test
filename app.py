@@ -36,7 +36,37 @@ def update_data(id):
 def delete_data(id):
     result = collection.delete_one({"_id": ObjectId(id)})
     return jsonify({"status": "success", "deleted_count": result.deleted_count})
+    
+@app.route('/authenticate_apk', methods=['POST'])
+def authenticate_apk():
+    # Récupérer les données envoyées dans la requête JSON
+    data = request.get_json()
+    nom = data.get("Nom")
+    code = data.get("Code")
+    phone = data.get("Phone")
+    
+    # Vérifier si les champs nom et code sont présents
+    if not nom or not code or not phone:
+        return jsonify({"authenticated": False, "message": "Nom ou code manquants"}), 400
 
+    # Rechercher l'utilisateur par nom et code
+    user = collection.find_one({"Nom": nom, "Code": code})
+
+    if user:
+        # L'utilisateur est authentifié
+        response = {
+            "authenticated": True,
+            "Nom": user.get("Nom", ""),
+            "Phone": user.get("Phone", ""),
+            "Carte": user.get("Carte", ""),
+            "Compte": user.get("Compte", ""),
+            "_id": {"$oid": str(user["_id"])}  # Convertir l'ObjectId en chaîne
+        }
+    else:
+        # Si l'utilisateur n'est pas trouvé avec le nom et le code
+        response = {"authenticated": False, "message": "Nom ou code incorrect"}
+
+    return jsonify(response)
 @app.route('/authenticate', methods=['POST'])
 def authenticate():
     # Exemple d'authentification simple
