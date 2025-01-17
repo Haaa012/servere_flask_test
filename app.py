@@ -13,6 +13,9 @@ collection = db['Data_collectio_nama']
 @app.route('/')
 def serve_frontend():
     return send_from_directory('templates', 'index.html')
+@app.route('/listeclient')
+def listeclient():
+    return send_from_directory('templates', 'listeclient.html')    
 
 @app.route('/create', methods=['POST'])
 def create_data():
