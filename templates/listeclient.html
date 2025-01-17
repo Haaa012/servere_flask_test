@@ -9,25 +9,6 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Gestion des Données (CRUD)</h1>
-        <form id="dataForm" class="mb-4">
-            <div class="mb-3">
-                <label for="nom" class="form-label">Nom</label>
-                <input type="text" id="nom" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label for="code" class="form-label">Code</label>
-                <input type="text" id="code" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label for="phone" class="form-label">Phone</label>
-                <input type="text" id="phone" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label for="idCarte" class="form-label">Id Carte</label>
-                <input type="text" id="idCarte" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Ajouter</button>
-        </form>
         <table class="table">
             <thead>
                 <tr>
@@ -39,32 +20,14 @@
             </thead>
             <tbody id="dataList"></tbody>
         </table>
+        <button class="btn btn-success" id="addButton">Ajouter un utilisateur</button>
     </div>
 
     <!-- JavaScript intégré -->
     <script>
-        const apiUrl = "https://tecnum-web.onrender.com"; // Remplacez par l'URL de votre serveur
+        const apiUrl = "http://127.0.0.1:5000"; // Remplacez par l'URL de votre serveur
 
-        document.getElementById("dataForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const nom = document.getElementById("nom").value;
-            const code = document.getElementById("code").value;
-            const phone = document.getElementById("phone").value;
-            const idCarte = document.getElementById("idCarte").value;
-
-            const response = await fetch(`${apiUrl}/create`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ Nom: nom, Code: code, Phone: phone, Carte: idCarte }),
-            });
-
-            if (response.ok) {
-                loadData();
-            } else {
-                alert("Erreur lors de l'ajout des données.");
-            }
-        });
-
+        // Charger les données initiales
         async function loadData() {
             const response = await fetch(`${apiUrl}/get_data`);
             const data = await response.json();
@@ -80,11 +43,115 @@
                     <td>${item.Phone}</td>
                     <td>${item.Carte || "Non défini"}</td>
                 `;
+                row.style.cursor = "pointer";
+                row.addEventListener("click", () => showEditDialog(item));
                 dataList.appendChild(row);
             });
         }
 
-        // Charger les données initiales
+        // Afficher un alert combobox pour modifier les données
+        function showEditDialog(item) {
+            const formHtml = `
+                <div>
+                    <label>Nom:</label><br>
+                    <input type="text" id="editNom" value="${item.Nom}" class="form-control"><br>
+                    <label>Code:</label><br>
+                    <input type="text" id="editCode" value="${item.Code}" class="form-control"><br>
+                    <label>Phone:</label><br>
+                    <input type="text" id="editPhone" value="${item.Phone}" class="form-control"><br>
+                    <label>Id Carte:</label><br>
+                    <input type="text" id="editCarte" value="${item.Carte || ''}" class="form-control"><br>
+                </div>
+            `;
+
+            if (confirmDialog(formHtml, "Modifier l'utilisateur", ["Annuler", "Supprimer", "Enregistrer"])) {
+                const newNom = document.getElementById("editNom").value;
+                const newCode = document.getElementById("editCode").value;
+                const newPhone = document.getElementById("editPhone").value;
+                const newCarte = document.getElementById("editCarte").value;
+
+                updateData(item._id.$oid, { Nom: newNom, Code: newCode, Phone: newPhone, Carte: newCarte });
+            }
+        }
+
+        // Afficher un alert combobox pour ajouter un utilisateur
+        document.getElementById("addButton").addEventListener("click", () => {
+            const formHtml = `
+                <div>
+                    <label>Nom:</label><br>
+                    <input type="text" id="addNom" class="form-control"><br>
+                    <label>Code:</label><br>
+                    <input type="text" id="addCode" class="form-control"><br>
+                    <label>Phone:</label><br>
+                    <input type="text" id="addPhone" class="form-control"><br>
+                    <label>Id Carte:</label><br>
+                    <input type="text" id="addCarte" class="form-control"><br>
+                </div>
+            `;
+
+            if (confirmDialog(formHtml, "Ajouter un utilisateur", ["Annuler", "Ajouter"])) {
+                const nom = document.getElementById("addNom").value;
+                const code = document.getElementById("addCode").value;
+                const phone = document.getElementById("addPhone").value;
+                const carte = document.getElementById("addCarte").value;
+
+                createData({ Nom: nom, Code: code, Phone: phone, Carte: carte });
+            }
+        });
+
+        // Confirmation dialog helper
+        function confirmDialog(content, title, buttons) {
+            const html = `
+                <div class="modal fade" tabindex="-1" role="dialog" id="customDialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">${title}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                ${content}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${buttons[0]}</button>
+                                ${buttons[1] ? `<button type="button" class="btn btn-danger">${buttons[1]}</button>` : ''}
+                                ${buttons[2] ? `<button type="button" class="btn btn-primary">${buttons[2]}</button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML("beforeend", html);
+        }
+
+        async function createData(data) {
+            const response = await fetch(`${apiUrl}/create`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                loadData();
+            } else {
+                alert("Erreur lors de l'ajout.");
+            }
+        }
+
+        async function updateData(id, data) {
+            const response = await fetch(`${apiUrl}/update/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                loadData();
+            } else {
+                alert("Erreur lors de la mise à jour.");
+            }
+        }
+
         loadData();
     </script>
 </body>
