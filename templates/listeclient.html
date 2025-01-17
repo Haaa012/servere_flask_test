@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des utilisateur</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f4f4f4;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>List des utilisateurs</h1>
+
+    <form id="dataForm">
+        <input type="hidden" id="dataId">
+        <label for="nom">Nom:</label>
+        <input type="text" id="nom" required><br><br>
+        <label for="code">Code:</label>
+        <input type="text" id="code" required><br><br>
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" required><br><br>
+        <button type="submit">Save</button>
+    </form>
+
+    <h2>Data List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Code</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="dataList"></tbody>
+    </table>
+
+    <script>
+        function loadData() {
+            $.get('/get_data', function(data) {
+                const rows = data.map(item => `
+                    <tr>
+                        <td>${item.Nom}</td>
+                        <td>${item.Code}</td>
+                        <td>${item.Phone}</td>
+                        <td>
+                            <button onclick="editData('${item._id.$oid}', '${item.Nom}', '${item.Code}', '${item.Phone}')">Edit</button>
+                            <button onclick="deleteData('${item._id.$oid}')">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+                $('#dataList').html(rows);
+            });
+        }
+
+        function editData(id, nom, code, phone) {
+            $('#dataId').val(id);
+            $('#nom').val(nom);
+            $('#code').val(code);
+            $('#phone').val(phone);
+        }
+
+        function deleteData(id) {
+            if (confirm('Are you sure you want to delete this data?')) {
+                $.ajax({
+                    url: `/delete/${id}`,
+                    type: 'DELETE',
+                    success: function() {
+                        alert('Data deleted successfully');
+                        loadData();
+                    }
+                });
+            }
+        }
+
+        $('#dataForm').submit(function(event) {
+            event.preventDefault();
+
+            const id = $('#dataId').val();
+            const nom = $('#nom').val();
+            const code = $('#code').val();
+            const phone = $('#phone').val();
+            const payload = { Nom: nom, Code: code, Phone: phone };
+
+            if (id) {
+                // Update existing data
+                $.ajax({
+                    url: `/update/${id}`,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function() {
+                        alert('Data updated successfully');
+                        $('#dataForm')[0].reset();
+                        loadData();
+                    }
+                });
+            } else {
+                // Create new data
+                $.post('/create', payload, function() {
+                    alert('Data created successfully');
+                    $('#dataForm')[0].reset();
+                    loadData();
+                });
+            }
+        });
+
+        // Initial load
+        loadData();
+    </script>
+</body>
+</html>
