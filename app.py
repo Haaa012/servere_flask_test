@@ -72,9 +72,10 @@ def authenticate():
     # Exemple d'authentification simple
     data = request.get_json()
     carte = data.get("Carte")
+    emprint = data.get("Idenprinte")
 
     # Rechercher la carte dans la collection MongoDB
-    user = collection.find_one({"Carte": carte})
+    user = collection.find_one({"Carte": carte,"Idenprinte":emprint})
     
     if user:
         # Construire la réponse avec l'_id inclus
@@ -83,6 +84,7 @@ def authenticate():
             "Nom": user.get("Nom", ""),
             "Carte": user.get("Carte", ""),
             "Compte": user.get("Compte", ""),
+            "Idemprinte": user.get("Idemprinte", ""),
             "_id": {"$oid": str(user["_id"])}  # Convertir ObjectId en chaîne
         }
     else:
