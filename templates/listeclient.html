@@ -6,26 +6,37 @@
     <title>Gestion des Données client</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <style>
-        body {
-            background: url('https://via.placeholder.com/1920x1080') no-repeat center center fixed;
-            background-size: cover;
-            font-family: 'Arial', sans-serif;
-        }
+            body {
+        background: url('sr.jpg') no-repeat center center fixed;
+        background-size: cover;
+        font-family: 'Arial', sans-serif;
+    }
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.137); /* Couleur blanche semi-transparente */
+        backdrop-filter: blur(1.5px); /* Flou de 8px */
+        z-index: -1; /* Assure que l'effet reste en arrière-plan */
+    }
 
-        .container {
-            background: rgba(255, 255, 255, 0.9); /* Transparence légère pour le fond */
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            padding: 30px;
-            margin-top: 50px;
-        }
+    .container {
+        background: rgba(255, 255, 255, 0.575); /* Transparence légère pour le fond */
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        padding: 30px;
+        margin-top: 50px;
+    }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #343a40;
-            text-align: center;
-        }
+    h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #343a40;
+        text-align: center;
+    }
 
         table {
             margin-top: 20px;
