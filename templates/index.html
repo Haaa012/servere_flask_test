@@ -40,7 +40,7 @@
 <header class="jumbotron text-center">
     <h1 class="display-4">Bienvenue sur MonSite!</h1>
     <p class="lead">Votre solution pour tout ce dont vous avez besoin.</p>
-    <a class="btn btn-primary btn-lg" href="#" role="button">En savoir plus</a>
+    <a class="btn btn-primary btn-lg" href="#" role="button">En savoir plus</a>    
 </header>
 
 <!-- Contenu principal -->
@@ -63,8 +63,20 @@
 
 <!-- Footer -->
 <footer class="bg-light text-center text-lg-start mt-5">
-    <!-- Grid container -->
-    <div class="container p-4">
+            <!-- Grid container -->
+        <div class="container p-4">
+                <!-- Bouton de partage Facebook -->
+        <div class="fb-share-button" 
+             data-href="https://smd-group.onrender.com" 
+             data-layout="button_count">
+        </div>
+        
+        <!-- Script SDK Facebook -->
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous" 
+            src="https://connect.facebook.net/fr_FR/sdk.js#xfbml=1&version=v15.0">
+        </script>
+
         <!-- Section: Contact -->
         <section class="mb-4">
             <h5>Contactez-nous</h5>
