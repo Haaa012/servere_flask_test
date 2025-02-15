@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traduction Multilingue</title>
+    <!-- Charger le CSS de select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='traduction.css') }}">
+    <style>
+        /* Style personnalisé pour aligner horizontalement la liste des pays avec les drapeaux */
+        .country-list {
+            display: flex;
+            flex-wrap: wrap; /* Permet à la liste de se répartir sur plusieurs lignes si nécessaire */
+            gap: 10px; /* Espacement entre les éléments */
+            list-style: none; /* Supprime les puces */
+            padding: 0;
+        }
+
+        .country-list li {
+            display: flex;
+            align-items: center; /* Aligne les icônes et les textes */
+        }
+
+        .country-list img {
+            width: 20px;
+            height: 14px;
+            margin-right: 5px;
+        }
+
+        .country-list li span {
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        /* Style pour le texte gris sous la liste des pays */
+        .gray-text {
+            color: #808080; /* Gris */
+            font-size: 14px; /* Taille de la police */
+            margin-top: 20px; /* Espace au-dessus du texte */
+        }
+          /* Style pour afficher le texte traduit */
+        .translated-text {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <h1>Traduction Multilingue</h1>
+
+    <form method="post">
+        <label for="text">Texte à traduire :</label><br>
+        <textarea name="text" id="text" placeholder="Écrivez ici..." oninput="showTyping()"></textarea><br>
+        <p id="typing-indicator" style="display:none; color: green;">Vous êtes en train d'écrire...</p>
+
+        <label for="source_lang">Langue source :</label>
+        <select name="source_lang" id="source_lang" class="language-select">
+            {% for code, name in languages.items() %}
+            <option value="{{ code }}" data-flag="{{ flags.get(code, '') }}">
+                {{ name.capitalize() }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <label for="target_lang">Langue cible :</label>
+        <select name="target_lang" id="target_lang" class="language-select">
+            {% for code, name in languages.items() %}
+            <option value="{{ code }}" data-flag="{{ flags.get(code, '') }}">
+                {{ name.capitalize() }}
+            </option>
+            {% endfor %}
+        </select><br>
+
+        <button type="submit">Traduire</button>
+     {% if translated_text %}
+        <h2>Traduction :</h2>
+        <p class="tras">{{ translated_text }}</p>
+    {% endif %}
+    </form>
+
+    <h2>Liste des pays avec leurs drapeaux:</h2>
+    <ul class="country-list">
+        {% for code, language in languages.items() %}
+            <li>
+                {% if flags.get(code) %}
+                    <img src="https://flagcdn.com/w40/{{ flags[code] }}.png" alt="{{ language }}">
+                {% endif %}
+                <span>{{ language.capitalize() }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Texte gris sous la liste des pays -->
+    <p class="gray-text">Voici la liste des pays avec leurs drapeaux. Sélectionnez une langue pour la traduction.</p>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialisation de select2 sur les éléments avec la classe 'language-select'
+            $('.language-select').select2({
+                templateResult: formatState, // Fonction pour personnaliser l'option affichée
+                templateSelection: formatState
+            });
+
+            function formatState(state) {
+                if (!state.id) {
+                    return state.text;
+                }
+
+                var flagCode = $(state.element).data('flag');
+                var flagUrl = 'https://flagcdn.com/w40/' + flagCode + '.png';
+
+                var $state = $(
+                    '<span><img src="' + flagUrl + '" style="width: 20px; height: 14px; margin-right: 5px;" />' + state.text + '</span>'
+                );
+                return $state;
+            }
+        });
+    </script>
+</body>
+</html>
