@@ -8,6 +8,67 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="{{ url_for('static', filename='traduction.css') }}">
     <style>
+        body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+textarea {
+    width: 80%;
+    height: 100px;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+  /* Style pour le bouton de soumission */
+button {
+            background-color: #4CAF50;  /* Couleur de fond */
+            color: white;  /* Couleur du texte */
+            font-size: 16px;  /* Taille de police */
+            padding: 10px 20px;  /* Marges internes */
+            border: none;  /* Pas de bordure */
+            border-radius: 5px;  /* Coins arrondis */
+            cursor: pointer;  /* Curseur en forme de main */
+            transition: background-color 0.3s ease;  /* Transition douce au survol */
+            margin-top: 20px;  /* Marge au-dessus */
+        }
+
+button:hover {
+            background-color: #45a049;  /* Couleur au survol */
+        }
+
+button:focus {
+            outline: none;  /* Retirer le contour du focus */
+        }
+
+h1 {
+    color: #333;
+}
+
+p {
+    font-size: 18px;
+    color: #333;
+}
+.tras {
+  width: 80%;
+  max-height: 300px;  /* Hauteur maximale de l'élément */
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #b0aeae61;
+  color: #060505;
+  text-align: left;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  box-sizing: border-box;
+  overflow-y: auto;  /* Ajoute une barre de défilement verticale lorsque nécessaire */
+}
         /* Style personnalisé pour aligner horizontalement la liste des pays avec les drapeaux */
         .country-list {
             display: flex;
